@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "nombre": "Docena de Rosas Rojas",
+    "descripcion": "12 rosas rojas frescas del campo andino, envueltas en papel kraft con lazo de tela.",
+    "precio": 45,
+    "precioAnterior": 60,
+    "emoji": "🌹",
+    "categoria": "amor aniversario",
+    "etiqueta": "Oferta",
+    "stock": 15,
+    "imagen": null
+  },
+  {
+    "id": 2,
+    "nombre": "Ramo de Girasoles",
+    "descripcion": "6 girasoles alegres y radiantes, perfectos para regalar energía y felicidad.",
+    "precio": 35,
+    "precioAnterior": null,
+    "emoji": "🌻",
+    "categoria": "cumpleanos amor",
+    "etiqueta": "Nuevo",
+    "stock": 8,
+    "imagen": null
+  },
+  {
+    "id": 3,
+    "nombre": "Arreglo Primaveral",
+    "descripcion": "Mix de flores de temporada con tulipanes, liliums y rosas en canasta artesanal.",
+    "precio": 75,
+    "precioAnterior": null,
+    "emoji": "💐",
+    "categoria": "aniversario cumpleanos",
+    "etiqueta": "Favorito",
+    "stock": 5,
+    "imagen": null
+  },
+  {
+    "id": 4,
+    "nombre": "Corona de Condolencias",
+    "descripcion": "Arreglo fúnebre con flores blancas, lirios y azucenas. Diseño elegante y respetuoso.",
+    "precio": 120,
+    "precioAnterior": null,
+    "emoji": "🤍",
+    "categoria": "condolencias",
+    "etiqueta": null,
+    "stock": 3,
+    "imagen": null
+  },
+  {
+    "id": 5,
+    "nombre": "Rosas Arco Iris",
+    "descripcion": "Rosas teñidas en colores vibrantes, un regalo único y sorprendente para cualquier ocasión.",
+    "precio": 55,
+    "precioAnterior": 70,
+    "emoji": "🌈",
+    "categoria": "amor cumpleanos",
+    "etiqueta": "Oferta",
+    "stock": 12,
+    "imagen": null
+  },
+  {
+    "id": 6,
+    "nombre": "Bouquet Andino",
+    "descripcion": "Mezcla de flores silvestres andinas con achicoria, kantuta y flores del campo cusqueño.",
+    "precio": 40,
+    "precioAnterior": null,
+    "emoji": "🌺",
+    "categoria": "amor aniversario",
+    "etiqueta": "Favorito",
+    "stock": 10,
+    "imagen": null
+  },
+  {
+    "id": 7,
+    "nombre": "Tulipanes Pastel",
+    "descripcion": "8 tulipanes en tonos pastel suaves. Elegantes y delicados para momentos especiales.",
+    "precio": 50,
+    "precioAnterior": null,
+    "emoji": "🌷",
+    "categoria": "aniversario amor",
+    "etiqueta": null,
+    "stock": 7,
+    "imagen": null
+  },
+  {
+    "id": 8,
+    "nombre": "Caja de Rosas Preservadas",
+    "descripcion": "Rosas tratadas que duran meses sin agua. Caja elegante de madera artesanal.",
+    "precio": 95,
+    "precioAnterior": null,
+    "emoji": "🎁",
+    "categoria": "amor aniversario cumpleanos",
+    "etiqueta": "Nuevo",
+    "stock": 6,
+    "imagen": null
+  }
+]
