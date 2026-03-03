@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel Admin – Encantos Eternos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="../frontend/style/style-dashboar.css">
+</head>
+<body>
+
+<div class="andean-stripe-thin"></div>
+<div id="toast-container"></div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-flower">🌸</div>
+    <div class="brand-text">
+      <div class="brand-name">Encantos Eternos</div>
+      <div class="brand-sub">Panel Admin</div>
+    </div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-link-s active" onclick="showPage('dashboard')"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link-s" onclick="showPage('ventas')"><i class="bi bi-graph-up-arrow"></i> Estadísticas</a>
+
+    <div class="nav-section">Tienda</div>
+    <a class="nav-link-s" onclick="showPage('productos')"><i class="bi bi-flower1"></i> Productos</a>
+    <a class="nav-link-s" onclick="showPage('inventario')"><i class="bi bi-box-seam"></i> Inventario</a>
+    <a class="nav-link-s" onclick="showPage('fotos')"><i class="bi bi-images"></i> Fotos / Galería</a>
+
+    <div class="nav-section">Finanzas</div>
+    <a class="nav-link-s" onclick="showPage('egresos')"><i class="bi bi-cash-stack"></i> Egresos</a>
+
+    <div class="nav-section">Personal</div>
+    <a class="nav-link-s" onclick="showPage('trabajadores')"><i class="bi bi-people"></i> Trabajadores</a>
+
+    <div class="nav-section">Sistema</div>
+    <a class="nav-link-s" onclick="window.open('index.html','_blank')"><i class="bi bi-shop"></i> Ver tienda</a>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar">👤</div>
+    <div class="user-info">
+      <div class="user-name" id="sidebarUserName">Admin</div>
+      <div class="user-role">Administrador</div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()" title="Cerrar sesión"><i class="bi bi-box-arrow-right"></i></button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main-content">
+  <div class="topbar">
+    <button class="btn-menu-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+    <div class="topbar-title" id="topbarTitle">🌸 Dashboard</div>
+    <div class="topbar-date" id="topbarDate"></div>
+  </div>
+
+  <!-- ============================
+       PAGE: DASHBOARD
+  ============================= -->
+  <div class="page active" id="page-dashboard">
+    <!-- Stats row -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-ico terra">💰</div>
+          <div>
+            <div class="stat-num" id="stat-ingresos">S/ 0</div>
+            <div class="stat-label">Ingresos este mes</div>
+            <div class="stat-delta up" id="stat-ing-delta">↑ 0%</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-ico mostaza">🛒</div>
+          <div>
+            <div class="stat-num" id="stat-ventas">0</div>
+            <div class="stat-label">Ventas este mes</div>
+            <div class="stat-delta up" id="stat-ven-delta">↑ 0%</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-ico verde">📦</div>
+          <div>
+            <div class="stat-num" id="stat-stock">0</div>
+            <div class="stat-label">Items en stock</div>
+            <div class="stat-delta" id="stat-stock-delta" style="color:var(--muted)">— total</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-ico azul">👥</div>
+          <div>
+            <div class="stat-num" id="stat-trabajadores">0</div>
+            <div class="stat-label">Trabajadores activos</div>
+            <div class="stat-delta" style="color:var(--muted)">En planilla</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-8">
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">📊 Ventas de los últimos 7 días</div>
+          </div>
+          <div class="panel-body chart-wrap" style="height:280px">
+            <canvas id="chartVentas7"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">🌸 Top productos</div>
+          </div>
+          <div class="panel-body" id="topProductsList" style="min-height:200px"></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">⚠️ Stock bajo</div>
+            <a onclick="showPage('inventario')" class="btn-flor btn-outline btn-sm-flor" style="cursor:pointer">Ver todo</a>
+          </div>
+          <div class="panel-body" id="lowStockList"></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">💸 Últimos egresos</div>
+            <a onclick="showPage('egresos')" class="btn-flor btn-outline btn-sm-flor" style="cursor:pointer">Ver todo</a>
+          </div>
+          <div class="panel-body" id="lastEgresosList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       PAGE: ESTADÍSTICAS
+  ============================= -->
+  <div class="page" id="page-ventas">
+    <!-- Registrar venta -->
+    <div class="panel-card mb-4">
+      <div class="panel-header">
+        <div class="panel-title">🛒 Registrar nueva venta</div>
+      </div>
+      <div class="panel-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-flor-label">Producto</label>
+            <select class="form-flor-select" id="ventaProducto"></select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-flor-label">Cantidad</label>
+            <input type="number" class="form-flor-input" id="ventaCantidad" value="1" min="1"/>
+          </div>
+          <div class="col-md-2">
+            <label class="form-flor-label">Precio (S/)</label>
+            <input type="number" class="form-flor-input" id="ventaPrecio" step="0.50"/>
+          </div>
+          <div class="col-md-2">
+            <label class="form-flor-label">Fecha</label>
+            <input type="date" class="form-flor-input" id="ventaFecha"/>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button class="btn-flor btn-terra w-100" onclick="registrarVenta()"><i class="bi bi-plus-circle"></i> Registrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="panel-card mb-4">
+      <div class="panel-header">
+        <div class="panel-title">📈 Análisis de ventas</div>
+        <div class="d-flex gap-2">
+          <select class="form-flor-select" id="filtroVentasPeriodo" onchange="actualizarGraficas()" style="width:auto;padding:.35rem .7rem">
+            <option value="7">7 días</option>
+            <option value="30" selected>30 días</option>
+            <option value="90">3 meses</option>
+          </select>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="row g-4">
+          <div class="col-md-8">
+            <div class="chart-wrap" style="height:260px">
+              <canvas id="chartVentasPeriodo"></canvas>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="chart-wrap" style="height:260px">
+              <canvas id="chartTopProd"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla ventas -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">📋 Historial de ventas</div>
+        <button class="btn-flor btn-outline btn-sm-flor" onclick="exportarVentas()"><i class="bi bi-download"></i> Exportar</button>
+      </div>
+      <div class="panel-body" style="overflow-x:auto">
+        <table class="table-flor" id="tablaVentas">
+          <thead><tr>
+            <th>Fecha</th><th>Producto</th><th>Cant.</th><th>Precio</th><th>Total</th><th>Acciones</th>
+          </tr></thead>
+          <tbody id="tablaVentasBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       PAGE: PRODUCTOS
+  ============================= -->
+  <div class="page" id="page-productos">
+    <div class="panel-card mb-4">
+      <div class="panel-header">
+        <div class="panel-title">🌹 Gestión de Productos</div>
+        <button class="btn-flor btn-terra" onclick="abrirModalProducto()"><i class="bi bi-plus-circle"></i> Nuevo producto</button>
+      </div>
+      <div class="panel-body" style="overflow-x:auto">
+        <table class="table-flor">
+          <thead><tr>
+            <th>Emoji</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Precio ant.</th><th>Etiqueta</th><th>Stock</th><th>Acciones</th>
+          </tr></thead>
+          <tbody id="tablaProductosBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       PAGE: INVENTARIO
+  ============================= -->
+  <div class="page" id="page-inventario">
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-ico verde">📦</div>
+          <div><div class="stat-num" id="inv-total">0</div><div class="stat-label">Total items</div></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-ico mostaza">⚠️</div>
+          <div><div class="stat-num" id="inv-bajo">0</div><div class="stat-label">Stock bajo (≤3)</div></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-ico terra">❌</div>
+          <div><div class="stat-num" id="inv-agotado">0</div><div class="stat-label">Agotados</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">📦 Control de Inventario</div>
+        <button class="btn-flor btn-verde" onclick="abrirModalAjuste()"><i class="bi bi-plus-minus"></i> Ajustar stock</button>
+      </div>
+      <div class="panel-body" style="overflow-x:auto">
+        <table class="table-flor">
+          <thead><tr>
+            <th>Producto</th><th>Stock actual</th><th>Estado</th><th>Stock mínimo</th><th>Actualizar</th>
+          </tr></thead>
+          <tbody id="tablaInventarioBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel-card mt-3">
+      <div class="panel-header"><div class="panel-title">📋 Historial de movimientos</div></div>
+      <div class="panel-body" style="overflow-x:auto">
+        <table class="table-flor">
+          <thead><tr><th>Fecha</th><th>Producto</th><th>Movimiento</th><th>Stock resultante</th><th>Nota</th></tr></thead>
+          <tbody id="tablaMovimientosBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       PAGE: FOTOS / GALERÍA
+  ============================= -->
+  <div class="page" id="page-fotos">
+    <div class="panel-card mb-4">
+      <div class="panel-header">
+        <div class="panel-title">📸 Subir fotos a la tienda</div>
+        <span style="font-size:.8rem;color:var(--muted)">Las fotos aparecen en la tienda automáticamente</span>
+      </div>
+      <div class="panel-body">
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label class="form-flor-label">Sección destino</label>
+            <select class="form-flor-select" id="fotoSeccion">
+              <option value="galeria">🖼️ Galería principal</option>
+              <option value="hero">🌺 Imagen Hero (portada)</option>
+              <option value="productos">🌹 Foto de producto</option>
+              <option value="eventos">🎉 Foto de eventos</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-flor-label">Título / descripción</label>
+            <input type="text" class="form-flor-input" id="fotoTitulo" placeholder="Ej: Ramo de novias..."/>
+          </div>
+          <div class="col-md-4">
+            <label class="form-flor-label">Producto (opcional)</label>
+            <select class="form-flor-select" id="fotoProductoRelacion">
+              <option value="">— Sin producto asociado —</option>
+            </select>
+          </div>
+        </div>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fotoInput').click()">
+          <span class="up-ico">📷</span>
+          <p><strong>Haz clic o arrastra fotos aquí</strong></p>
+          <p style="margin-top:.25rem">PNG, JPG, WebP · Máx. 5MB por foto</p>
+        </div>
+        <input type="file" id="fotoInput" accept="image/*" multiple style="display:none" onchange="procesarFotos(this.files)"/>
+        <div id="fotoPreview" class="row g-2 mt-3"></div>
+        <div class="mt-3 d-flex gap-2">
+          <button class="btn-flor btn-terra" onclick="guardarFotos()"><i class="bi bi-cloud-upload"></i> Guardar en tienda</button>
+          <button class="btn-flor btn-outline" onclick="limpiarPreview()"><i class="bi bi-trash"></i> Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">🖼️ Fotos guardadas</div>
+        <span id="totalFotos" style="font-size:.8rem;color:var(--muted)">0 fotos</span>
+      </div>
+      <div class="panel-body">
+        <div class="d-flex gap-2 mb-3 flex-wrap">
+          <button class="btn-flor btn-outline btn-sm-flor filtro-foto-btn active" data-seccion="todas" onclick="filtrarFotos('todas',this)">Todas</button>
+          <button class="btn-flor btn-outline btn-sm-flor filtro-foto-btn" data-seccion="galeria" onclick="filtrarFotos('galeria',this)">🖼️ Galería</button>
+          <button class="btn-flor btn-outline btn-sm-flor filtro-foto-btn" data-seccion="hero" onclick="filtrarFotos('hero',this)">🌺 Hero</button>
+          <button class="btn-flor btn-outline btn-sm-flor filtro-foto-btn" data-seccion="productos" onclick="filtrarFotos('productos',this)">🌹 Productos</button>
+          <button class="btn-flor btn-outline btn-sm-flor filtro-foto-btn" data-seccion="eventos" onclick="filtrarFotos('eventos',this)">🎉 Eventos</button>
+        </div>
+        <div class="row g-2" id="galeriaAdmin"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       PAGE: EGRESOS
+  ============================= -->
+  <div class="page" id="page-egresos">
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-ico terra">💸</div>
+          <div><div class="stat-num" id="eg-mes">S/ 0</div><div class="stat-label">Egresos este mes</div></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-ico mostaza">📅</div>
+          <div><div class="stat-num" id="eg-semana">S/ 0</div><div class="stat-label">Egresos esta semana</div></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-ico verde">📊</div>
+          <div><div class="stat-num" id="eg-balance">S/ 0</div><div class="stat-label">Balance (ing - eg)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card mb-4">
+      <div class="panel-header"><div class="panel-title">➕ Nuevo egreso</div></div>
+      <div class="panel-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-flor-label">Categoría</label>
+            <select class="form-flor-select" id="egresoCategoria">
+              <option value="flores">🌸 Compra de flores</option>
+              <option value="materiales">🎀 Materiales</option>
+              <option value="salarios">👥 Salarios</option>
+              <option value="servicios">💡 Servicios (luz, agua)</option>
+              <option value="transporte">🚚 Transporte</option>
+              <option value="otros">📦 Otros</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-flor-label">Descripción</label>
+            <input type="text" class="form-flor-input" id="egresoDesc" placeholder="Ej: Compra rosas cusco..."/>
+          </div>
+          <div class="col-md-2">
+            <label class="form-flor-label">Monto (S/)</label>
+            <input type="number" class="form-flor-input" id="egresoMonto" step="0.50" min="0" placeholder="0.00"/>
+          </div>
+          <div class="col-md-2">
+            <label class="form-flor-label">Fecha</label>
+            <input type="date" class="form-flor-input" id="egresoFecha"/>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button class="btn-flor btn-terra w-100" onclick="registrarEgreso()"><i class="bi bi-plus-circle"></i> Guardar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card mb-4">
+      <div class="panel-header"><div class="panel-title">📊 Egresos por categoría</div></div>
+      <div class="panel-body">
+        <div class="row g-3">
+          <div class="col-md-6"><div class="chart-wrap" style="height:220px"><canvas id="chartEgresosCat"></canvas></div></div>
+          <div class="col-md-6" id="egresosResumenCat"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-title">📋 Historial de egresos</div>
+        <button class="btn-flor btn-outline btn-sm-flor" onclick="exportarEgresos()"><i class="bi bi-download"></i> Exportar</button>
+      </div>
+      <div class="panel-body" style="overflow-x:auto">
+        <table class="table-flor">
+          <thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Monto</th><th>Acciones</th></tr></thead>
+          <tbody id="tablaEgresosBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       PAGE: TRABAJADORES
+  ============================= -->
+  <div class="page" id="page-trabajadores">
+    <div class="panel-card mb-4">
+      <div class="panel-header">
+        <div class="panel-title">👥 Equipo Encantos Eternos</div>
+        <button class="btn-flor btn-terra" onclick="abrirModalTrabajador()"><i class="bi bi-person-plus"></i> Nuevo trabajador</button>
+      </div>
+      <div class="panel-body">
+        <div class="row g-3" id="gridTrabajadores"></div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-header"><div class="panel-title">💰 Planilla del mes</div></div>
+      <div class="panel-body" style="overflow-x:auto">
+        <table class="table-flor">
+          <thead><tr><th>Trabajador</th><th>Cargo</th><th>Sueldo base</th><th>Bonos</th><th>Descuentos</th><th>Total a pagar</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="tablaPlanillaBody"></tbody>
+        </table>
+        <div class="mt-3 d-flex justify-content-end align-items-center gap-3">
+          <strong style="color:var(--muted)">Total planilla:</strong>
+          <span id="totalPlanilla" style="font-family:'Caveat',cursive;font-size:1.5rem;color:var(--terracota);font-weight:700">S/ 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<!-- MODALES -->
+
+<!-- Modal Producto -->
+<div class="modal fade modal-flor" id="modalProducto" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalProductoTitle">🌸 Nuevo Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="prodId"/>
+        <div class="row g-3">
+          <div class="col-md-2">
+            <label class="form-flor-label">Emoji</label>
+            <input type="text" class="form-flor-input" id="prodEmoji" placeholder="🌹" maxlength="4"/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-flor-label">Nombre del producto</label>
+            <input type="text" class="form-flor-input" id="prodNombre" placeholder="Ej: Docena de Rosas Rojas..."/>
+          </div>
+          <div class="col-md-4">
+            <label class="form-flor-label">Etiqueta</label>
+            <select class="form-flor-select" id="prodEtiqueta">
+              <option value="">Sin etiqueta</option>
+              <option value="Nuevo">🆕 Nuevo</option>
+              <option value="Oferta">🏷️ Oferta</option>
+              <option value="Favorito">⭐ Favorito</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-flor-label">Descripción</label>
+            <textarea class="form-flor-textarea" id="prodDesc" placeholder="Describe el producto..."></textarea>
+          </div>
+          <div class="col-md-3">
+            <label class="form-flor-label">Precio (S/)</label>
+            <input type="number" class="form-flor-input" id="prodPrecio" step="0.50" min="0"/>
+          </div>
+          <div class="col-md-3">
+            <label class="form-flor-label">Precio anterior (S/)</label>
+            <input type="number" class="form-flor-input" id="prodPrecioAnt" step="0.50" min="0" placeholder="0 = sin tachado"/>
+          </div>
+          <div class="col-md-3">
+            <label class="form-flor-label">Stock inicial</label>
+            <input type="number" class="form-flor-input" id="prodStock" min="0" value="0"/>
+          </div>
+          <div class="col-md-3">
+            <label class="form-flor-label">Categorías</label>
+            <div class="d-flex flex-wrap gap-2 mt-1">
+              <label style="font-size:.8rem;display:flex;align-items:center;gap:.3rem;cursor:pointer">
+                <input type="checkbox" id="catAmor" value="amor"/> Amor ❤️</label>
+              <label style="font-size:.8rem;display:flex;align-items:center;gap:.3rem;cursor:pointer">
+                <input type="checkbox" id="catAniversario" value="aniversario"/> Aniversario 💍</label>
+              <label style="font-size:.8rem;display:flex;align-items:center;gap:.3rem;cursor:pointer">
+                <input type="checkbox" id="catCumple" value="cumpleanos"/> Cumpleaños 🎂</label>
+              <label style="font-size:.8rem;display:flex;align-items:center;gap:.3rem;cursor:pointer">
+                <input type="checkbox" id="catCondolencias" value="condolencias"/> Condolencias 🕊️</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-flor btn-outline" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-flor btn-terra" onclick="guardarProducto()"><i class="bi bi-check-circle"></i> Guardar producto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Trabajador -->
+<div class="modal fade modal-flor" id="modalTrabajador" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTrabTitle">👤 Nuevo Trabajador</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="trabId"/>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-flor-label">Nombre completo</label>
+            <input type="text" class="form-flor-input" id="trabNombre" placeholder="Nombre y apellidos..."/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-flor-label">Cargo</label>
+            <select class="form-flor-select" id="trabCargo">
+              <option value="Florista">🌸 Florista</option>
+              <option value="Vendedora">💁 Vendedora</option>
+              <option value="Repartidor">🛵 Repartidor</option>
+              <option value="Cajera">💰 Cajera</option>
+              <option value="Administradora">📋 Administradora</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-flor-label">Teléfono</label>
+            <input type="text" class="form-flor-input" id="trabTelefono" placeholder="+51 9..."/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-flor-label">Fecha de ingreso</label>
+            <input type="date" class="form-flor-input" id="trabIngreso"/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-flor-label">Sueldo base (S/)</label>
+            <input type="number" class="form-flor-input" id="trabSueldo" step="50" min="0" placeholder="1200"/>
+          </div>
+          <div class="col-md-6">
+            <label class="form-flor-label">Estado</label>
+            <select class="form-flor-select" id="trabEstado">
+              <option value="activo">✅ Activo</option>
+              <option value="inactivo">❌ Inactivo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-flor btn-outline" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-flor btn-terra" onclick="guardarTrabajador()"><i class="bi bi-check-circle"></i> Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Ajuste Stock -->
+<div class="modal fade modal-flor" id="modalAjuste" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">📦 Ajustar stock</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-flor-label">Producto</label>
+            <select class="form-flor-select" id="ajusteProducto"></select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-flor-label">Tipo de movimiento</label>
+            <select class="form-flor-select" id="ajusteTipo">
+              <option value="entrada">📥 Entrada (compra)</option>
+              <option value="salida">📤 Salida (venta/daño)</option>
+              <option value="ajuste">🔄 Ajuste manual</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-flor-label">Cantidad</label>
+            <input type="number" class="form-flor-input" id="ajusteCantidad" min="1" value="1"/>
+          </div>
+          <div class="col-12">
+            <label class="form-flor-label">Nota (opcional)</label>
+            <input type="text" class="form-flor-input" id="ajusteNota" placeholder="Ej: Compra mercado Sicuani..."/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-flor btn-outline" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-flor btn-terra" onclick="guardarAjuste()"><i class="bi bi-check-circle"></i> Aplicar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../backend/auth.js"></script>
+<script src="../frontend/js/dashboard.js"></script>
+</body>
+</html>
